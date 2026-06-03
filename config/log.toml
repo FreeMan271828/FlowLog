@@ -1,0 +1,10 @@
+# config/log.toml
+
+# 日志最低输出级别：Dbg, Log, Warn, Err
+level = "Warn"
+
+# 是否开启异步日志流
+enable_async = true
+
+# 异步模式下的缓冲区大小（队列容量）
+buffer_size = 2048

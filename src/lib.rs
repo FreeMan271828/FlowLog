@@ -1,14 +1,9 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+pub mod core;
+pub mod formatters;
+pub mod pipeline;
+pub mod sinks;
+pub mod macros;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+/// 将宏内部需要用到的核心组件，重导出到库的根路径下
+pub use crate::core::level::LogLevel;
+pub use crate::pipeline::emitter::LogEmitter;
