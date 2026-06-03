@@ -18,7 +18,6 @@ flowlog/
 │   │   ├── file.rs           # 文件输出
 │   │   ├── s3.rs             # S3 输出
 │   │   ├── elastic.rs        # Elasticsearch 输出
-│   │   ├── kafka.rs          # Kafka 输出
 │   │   └── chain.rs          # 链式输出
 │   ├── formatters/
 │   │   ├── mod.rs
