@@ -1,10 +1,12 @@
 # config/log.toml
 
-# 日志最低输出级别：Dbg, Log, Warn, Err
-level = "Warn"
+level = "Warn"              # 日志输出级别：Dbg, Log, Warn, Err
+enable_async = true         # 是否开启异步日志流
+buffer_size = 2048          # 异步模式下的缓冲区大小（队列容量）
 
-# 是否开启异步日志流
-enable_async = true
+file_path = "./log"         # 日志的文件输出文件夹
+max_size = 10485760         # 单个文件的最大大小
+rotate_num = 5              # 最多保留的文件数目
 
-# 异步模式下的缓冲区大小（队列容量）
-buffer_size = 2048
+# 日志重定向深潜方式，Console, File, S3, Elastic
+sink_type = ["Console"]                
