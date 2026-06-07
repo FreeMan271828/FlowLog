@@ -1,0 +1,8 @@
+[16:26:52.194] [Dbg] (src/main.rs:4) - Test dbg
+[16:26:52.194] [Log] (src/main.rs:5) - Test log
+[16:26:52.194] [Warn] (src/main.rs:6) - Warn the memory usage is90
+[16:26:52.194] [Err] (src/main.rs:7) - Test Err
+[16:26:57.795] [Dbg] (src/main.rs:4) - Test dbg
+[16:26:57.795] [Log] (src/main.rs:5) - Test log
+[16:26:57.795] [Warn] (src/main.rs:6) - Warn the memory usage is90
+[16:26:57.795] [Err] (src/main.rs:7) - Test Err

@@ -1,16 +1,22 @@
+use crate::core::record::LogRecord;
 use crate::sinks::Sink;
 
-pub struct Console;
+pub struct ConsoleSink;
 
-impl Sink for Console {
-    fn redirect(record: &crate::core::record::LogRecord) {
+impl Sink for ConsoleSink {
+    fn redirect(self: &ConsoleSink, record: &LogRecord) -> Result<(), std::io::Error> {
         println!(
             "[{}] [{:?}] ({}:{}) - {}",
-            record.timestamp.format("%m-%d %H:%M:%S%.1f"),
+            record.timestamp.format("%H:%M:%S%.3f"),
             record.level,
             record.file.unwrap_or("unknown"),
             record.line.unwrap_or(0),
             record.body
         );
+        Ok(())
+    }
+
+    fn new() -> &'static Self{
+        &ConsoleSink {}
     }
 }

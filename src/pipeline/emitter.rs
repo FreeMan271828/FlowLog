@@ -2,7 +2,7 @@ use crate::core::level::LogLevel;
 use crate::core::record::LogRecord;
 use crate::pipeline::processor::LogProcessor;
 use std::borrow::Cow;
-/// 日志发送器，负责日志的组装、发送
+/// 日志发送器，负责日志的组装、发送给日志处理器
 pub struct LogEmitter;
 
 impl LogEmitter {
@@ -17,6 +17,6 @@ impl LogEmitter {
         record.target = Cow::Borrowed(target);
         record.file = Some(file);
         record.line = Some(line);
-        LogProcessor::global().process(&record);
+        LogProcessor::new().process(&record);
     }
 }
