@@ -1,18 +1,14 @@
-use crate::core::level::LogLevel;
+use crate::{constants, core::level::LogLevel, sinks::SinkType};
 use config::{Config, ConfigError, File};
 use serde::Deserialize;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Deserialize)]
 pub struct LogConfig {
-    #[serde(default = "default_level")]
     pub level: LogLevel,
-    
-    #[serde(default = "default_async")]
     pub enable_async: bool,
-    
-    #[serde(default = "default_buffer")]
     pub buffer_size: usize,
+    pub sink_type: Vec<SinkType>
 }
 
 impl Default for LogConfig {
@@ -21,22 +17,17 @@ impl Default for LogConfig {
             level: LogLevel::Log,
             enable_async: false,
             buffer_size: 1024,
+            sink_type: vec![SinkType::Console]
         }
     }
 }
 
-#[allow(dead_code)]
-impl LogConfig {
-    pub fn load() -> Result<Self, ConfigError> {
+impl crate::Config for LogConfig {
+    fn load() -> Result<Self, ConfigError> {
         let s = Config::builder()
-            .add_source(File::with_name("config/log").required(false))
+            .add_source(File::with_name(constants::CONFIG_PATH)
+            .required(false))
             .build()?;
-
         s.try_deserialize()
     }
 }
-
-/// 获取默认日志等级
-fn default_level() -> LogLevel { LogLevel::Log }
-fn default_async() -> bool { false }
-fn default_buffer() -> usize { 1024 }
