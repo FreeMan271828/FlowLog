@@ -1,7 +1,11 @@
 [package]
+authors = ["freeman"]
 name = "flowlog"
 version = "0.2.0"
 edition = "2024"
+license = "MIT"
+description = "A more powerful with mulity_output logger"
+repository = "https://github.com/FreeMan271828/FlowLog"
 
 [dependencies]
 chrono = "0.4.44"
