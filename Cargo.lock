@@ -35,6 +35,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
+name = "betterlog"
+version = "0.2.0"
+dependencies = [
+ "chrono",
+ "config",
+ "serde",
+ "strum",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -211,16 +221,6 @@ name = "find-msvc-tools"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
-
-[[package]]
-name = "flowlog"
-version = "0.2.0"
-dependencies = [
- "chrono",
- "config",
- "serde",
- "strum",
-]
 
 [[package]]
 name = "foldhash"
