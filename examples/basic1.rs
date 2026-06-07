@@ -3,6 +3,6 @@ use flowlog::{debug, err, log, warn};
 pub fn main(){
     debug!("Test dbg");
     log!("Test log");
-    warn!("Warn the memory usage is{}", 90);
+    warn!("警告：内存占用 {} 过高！", 90);
     err!("Test Err");
 }

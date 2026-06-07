@@ -1,7 +1,7 @@
 use std::{fs, path::PathBuf};
 use std::fs::create_dir_all;
 use std::io::Write;
-use std::sync::{Mutex, OnceLock};
+use std::sync::{OnceLock};
 use chrono::Local;
 use config::{Config, File};
 use serde::Deserialize;
@@ -9,7 +9,7 @@ use serde::Deserialize;
 use crate::constants;
 use crate::Config as MyConfig;
 use crate::core::record::LogRecord;
-use crate::sinks::{file, Sink};
+use crate::sinks::{Sink};
 
 /// file_path 保留日志文件夹
 /// max_size 日志超过这个大小创建新的文件

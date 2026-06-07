@@ -1,10 +1,9 @@
 [package]
 name = "flowlog"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
-colored = "3.1.1"
 chrono = "0.4.44"
 config = "0.15.23"
 serde = { version = "1.0.228", features = ["derive"] }

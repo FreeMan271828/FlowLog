@@ -22,7 +22,9 @@ impl LogProcessor {
             return;
         }
         for sink_type in &self.config.sink_type{
-            sink(&sink_type, record);
+            sink(&sink_type, record).unwrap_or_else(|err| {
+                println!("The {:?} has err {}", sink_type, err);
+            })
         }
     }
 }
