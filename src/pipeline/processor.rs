@@ -10,7 +10,7 @@ impl LogProcessor {
         static INSTANCE: OnceLock<LogProcessor> = OnceLock::new();
         INSTANCE.get_or_init(|| {
             let config =  LogConfig::load().unwrap_or_else(|err| {
-                println!("无法加载日志配置文件: {}，将使用默认配置。", err);
+                println!("无法加载日志核心配置文件: {}，将使用默认配置。", err);
                 LogConfig::default()
             });
             LogProcessor { config }

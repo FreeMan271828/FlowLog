@@ -25,9 +25,9 @@ pub struct FileConfig{
 impl Default for FileConfig {
     fn default() -> Self{
         FileConfig { 
-            dir_path: PathBuf::from("log"),
-            max_size: Some(10485760), // 10MB
-            rotate_num: Some(5),
+            dir_path: PathBuf::from(""),
+            max_size: None,
+            rotate_num: None,
         }
     }
 }
@@ -53,6 +53,9 @@ impl Sink for FileSink {
 
     fn redirect(&self, record: &LogRecord) -> Result<(), std::io::Error> {
         let FileConfig { dir_path, max_size, rotate_num } = &self.config;
+        if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
+            return Ok(());
+        }
         let mut file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
         let bytes = record.as_bytes();
         file.write_all(bytes.as_slice()).expect("Write File Err");
@@ -63,10 +66,19 @@ impl Sink for FileSink {
     fn new() -> &'static Self {
         static INSTANCE: OnceLock<FileSink> = OnceLock::new();
         INSTANCE.get_or_init(|| {
-            let config = FileConfig::load().unwrap_or_else(|e| {
-                println!("无法加载日志配置文件: {}，将使用默认配置。", e);
+            let mut config = FileConfig::load().unwrap_or_else(|_| {
                 FileConfig::default()
             });
+            // 检查是否小于最低要求
+            let min_config = constants::FILE_CONFIG_MIN;
+            if config.max_size < Some(min_config.0) || config.rotate_num < Some(min_config.1){
+                println!("日志配置小于最低要求：512KB，1个轮转文件");
+                config = FileConfig::default();
+            }
+            let FileConfig { dir_path, max_size, rotate_num } = &config;
+            if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
+                println!("无法加载文件日志配置，将自动禁用");
+            }
             FileSink{config}
         })
     }

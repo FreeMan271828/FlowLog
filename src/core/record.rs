@@ -1,13 +1,13 @@
 use std::borrow::Cow;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 
 use crate::core::level::LogLevel;
 
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct LogRecord<'a>{
-    pub timestamp: DateTime<Utc>,
+    pub timestamp: DateTime<Local>,
     pub level: LogLevel,
     pub target: Cow<'a, str>,
     pub file: Option<&'a str>,
@@ -19,7 +19,7 @@ pub struct LogRecord<'a>{
 impl<'a> LogRecord<'a> {
     pub fn new(level: LogLevel, body: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            timestamp: Utc::now(),
+            timestamp: Local::now(),
             level,
             target: Cow::Borrowed(""),
             file: None,

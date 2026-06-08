@@ -1,4 +1,4 @@
-use flowlog::{debug, err, log, warn};
+use betterlog::*;
 
 pub fn main(){
     debug!("Test dbg");
