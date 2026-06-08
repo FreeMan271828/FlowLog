@@ -1,5 +1,5 @@
-use crate::core::level::LogLevel;
-use crate::core::record::LogRecord;
+use crate::entity::level::LogLevel;
+use crate::entity::record::LogRecord;
 use crate::pipeline::processor::LogProcessor;
 use std::borrow::Cow;
 /// 日志发送器，负责日志的组装、发送给日志处理器

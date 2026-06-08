@@ -1,4 +1,4 @@
-use crate::core::record::LogRecord;
+use crate::entity::record::LogRecord;
 use crate::sinks::Sink;
 
 pub struct ConsoleSink;

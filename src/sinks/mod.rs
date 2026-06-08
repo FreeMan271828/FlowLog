@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use strum::EnumString;
 
-use crate::{core::record::LogRecord};
+use crate::{entity::record::LogRecord};
 use crate::sinks::console::ConsoleSink;
 use crate::sinks::file::FileSink;
 

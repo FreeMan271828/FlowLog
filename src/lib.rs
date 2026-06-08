@@ -1,15 +1,10 @@
-pub mod core;
+pub mod entity;
 pub mod formatters;
 pub mod pipeline;
 pub mod sinks;
 pub mod macros;
 pub mod constants;
+pub mod config;
 
-use config::ConfigError;
-
-pub use crate::core::level::LogLevel;
+pub use crate::entity::level::LogLevel;
 pub use crate::pipeline::emitter::LogEmitter;
-
-pub trait Config : Default{
-    fn load() -> Result<Self, ConfigError> where Self: Sized;
-}

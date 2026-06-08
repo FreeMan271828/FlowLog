@@ -1,4 +1,4 @@
-use crate::{Config, core::record::LogRecord, pipeline::config::LogConfig, sinks::sink};
+use crate::{config::{ConfigTrait, pipe_config::LogConfig}, entity::record::LogRecord, sinks::sink};
 use std::sync::OnceLock;
 
 pub struct LogProcessor {

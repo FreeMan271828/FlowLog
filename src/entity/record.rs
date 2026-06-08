@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use chrono::{DateTime, Local};
 
-use crate::core::level::LogLevel;
+use crate::entity::level::LogLevel;
 
 #[allow(dead_code)]
 #[derive(Debug)]
