@@ -7,6 +7,7 @@ use crate::sinks::console::ConsoleSink;
 use crate::sinks::file::FileSink;
 
 pub mod console;
+pub mod s3;
 pub mod file;
 
 /// 对于sink_type到具体执行的映射

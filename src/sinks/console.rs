@@ -1,6 +1,6 @@
 use std::sync::{Arc, OnceLock, RwLock};
 
-use crate::{Configurable, LogHandler, config::console_config::ConsoleConfig, entity::record::LogRecord};
+use crate::{Configurable, LogHandler, entity::record::LogRecord};
 
 pub struct ConsoleSink;
 

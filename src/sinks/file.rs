@@ -42,6 +42,7 @@ impl LogHandler for FileSink {
     fn handle(&self, record: &LogRecord) -> Result<(), std::io::Error> {
         let FileConfig { dir_path, max_size, rotate_num } = &self.config;
         if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
+            println!("Something err while handling file, you can choose to remove File option");
             return Ok(());
         }
         let mut file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
