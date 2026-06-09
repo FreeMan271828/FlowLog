@@ -1,10 +1,25 @@
-use crate::entity::record::LogRecord;
-use crate::sinks::Sink;
+use std::sync::{Arc, OnceLock, RwLock};
+
+use crate::{Configurable, LogHandler, config::console_config::ConsoleConfig, entity::record::LogRecord};
 
 pub struct ConsoleSink;
 
-impl Sink for ConsoleSink {
-    fn redirect(self: &ConsoleSink, record: &LogRecord) -> Result<(), std::io::Error> {
+static INSTANCE: OnceLock<Arc<RwLock<ConsoleSink>>> = OnceLock::new();
+
+impl Configurable for ConsoleSink {
+    fn new() -> Arc<RwLock<Self>> where Self: Sized {
+        INSTANCE.get_or_init(|| {
+            Arc::new(RwLock::new(ConsoleSink{}))
+        }).clone()
+    }
+
+    fn reload() {
+        println!("Console has no config, not need to update") 
+    }
+}
+
+impl LogHandler for ConsoleSink{
+    fn handle(&self, record: &LogRecord) -> Result<(), std::io::Error> {
         println!(
             "[{}] [{:?}] ({}:{}) - {}",
             record.timestamp.format("%H:%M:%S%.3f"),
@@ -14,9 +29,5 @@ impl Sink for ConsoleSink {
             record.body
         );
         Ok(())
-    }
-
-    fn new() -> &'static Self{
-        &ConsoleSink {}
     }
 }

@@ -1,26 +1,45 @@
 use std::{fs, path::PathBuf};
 use std::fs::create_dir_all;
 use std::io::Write;
-use std::sync::{OnceLock};
+use std::sync::{Arc, OnceLock, RwLock};
 use chrono::Local;
 
 use crate::config::ConfigTrait;
 use crate::config::file_config::FileConfig;
-use crate::constants;
+use crate::{Configurable, LogHandler, constants};
 use crate::entity::record::LogRecord;
-use crate::sinks::{Sink};
 
 /// 文件保存逻辑
 /// 1. 获取最新的文件，判断当前文件是否超额
 /// 2. 如果超额，则创建新文件，采用log-YY-mm-DD形式，并判断文件个数是否超过预设
 /// 3. 如果超过，则删除最旧的文件
+
+static INSTANCE: OnceLock<Arc<RwLock<FileSink>>> = OnceLock::new();
 pub struct FileSink {
     config: FileConfig,
 }
 
-impl Sink for FileSink {
 
-    fn redirect(&self, record: &LogRecord) -> Result<(), std::io::Error> {
+impl Configurable for FileSink {
+    fn new() -> Arc<RwLock<Self>> where Self: Sized  {
+        INSTANCE.get_or_init(|| {
+            Arc::new(RwLock::new(Self::create_file_sink()))
+        }).clone()
+    }
+    
+    fn reload(){
+        if let Some(instance) = INSTANCE.get() {
+            let new_sink = Self::create_file_sink();
+            if let Ok(mut sink) = instance.write() {
+                *sink = new_sink;
+                println!("The file config has updated");
+            }
+        }
+    }
+}
+
+impl LogHandler for FileSink {
+    fn handle(&self, record: &LogRecord) -> Result<(), std::io::Error> {
         let FileConfig { dir_path, max_size, rotate_num } = &self.config;
         if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
             return Ok(());
@@ -31,29 +50,28 @@ impl Sink for FileSink {
         file.flush().expect("Flush File Err");
         Ok(())
     }
-
-    fn new() -> &'static Self {
-        static INSTANCE: OnceLock<FileSink> = OnceLock::new();
-        INSTANCE.get_or_init(|| {
-            let mut config = FileConfig::load().unwrap_or_else(|_| {
-                FileConfig::default()
-            });
-            // 检查是否小于最低要求
-            let min_config = constants::FILE_CONFIG_MIN;
-            if config.max_size < Some(min_config.0) || config.rotate_num < Some(min_config.1){
-                println!("日志配置小于最低要求：512KB，1个轮转文件");
-                config = FileConfig::default();
-            }
-            let FileConfig { dir_path, max_size, rotate_num } = &config;
-            if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
-                println!("无法加载文件日志配置，将自动禁用");
-            }
-            FileSink{config}
-        })
-    }
 }
 
 impl FileSink {
+
+    fn create_file_sink() -> FileSink{
+        let mut config = FileConfig::load().unwrap_or_else(|_| {
+            FileConfig::default()
+        });
+        
+        let min_config = constants::FILE_CONFIG_MIN;
+        if config.max_size < Some(min_config.0) || config.rotate_num < Some(min_config.1) {
+            println!("日志配置小于最低要求：512KB，1个轮转文件");
+            config = FileConfig::default();
+        }
+        
+        let FileConfig { dir_path, max_size, rotate_num } = &config;
+        if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
+            println!("无法加载文件日志配置，将自动禁用");
+        }
+        
+        FileSink { config }
+    }
 
     fn choose_file(dir_path: &PathBuf, max_size: u64, rotate_num: usize) -> Result<fs::File, std::io::Error> {
         if !dir_path.exists() {

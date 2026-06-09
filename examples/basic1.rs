@@ -1,8 +1,18 @@
-use betterlog::*;
+use core::time;
+use std::thread;
+
+use betterlog::{config::start_config_watch, *};
 
 pub fn main(){
-    debug!("Test dbg");
-    log!("Test log");
-    warn!("警告：内存占用 {} 过高！", 90);
-    err!("Test Err");
+    if let Ok(_) = start_config_watch(){
+        let index = 0;
+        loop {
+            log!("index: {}", index);
+            debug!("Test dbg");
+            log!("Test log");
+            warn!("警告：内存占用 {} 过高！", 90);
+            err!("Test Err");   
+            thread::sleep(time::Duration::from_secs(3));
+        }
+    }
 }

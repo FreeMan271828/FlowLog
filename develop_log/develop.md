@@ -6,4 +6,5 @@
     - 设置文件大小和rotate_num的基础最小阈值，设置小于阈值将判定为配置错误，阈值设置在const中
 - （预研）修改配置后无需重启，研究热加载
   - 把配置文件全部放入同一个文件夹
-  - 
+  - 修改Sink特征，设置实例为 OnceLock<Arc<RwLock>> 修改new方法返回 Arc<RwLock>，添加reload方法
+  - 使用notify来监控配置文件变化
