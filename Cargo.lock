@@ -562,12 +562,14 @@ version = "0.2.0"
 dependencies = [
  "aws-config",
  "aws-sdk-s3",
+ "bytes",
  "chrono",
  "config",
  "notify",
  "notify-debouncer-mini",
  "serde",
  "strum",
+ "tokio",
 ]
 
 [[package]]

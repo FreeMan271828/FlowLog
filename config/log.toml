@@ -15,7 +15,7 @@ rotate_num = 1              # 最多保留的文件数目
 # S3深潜的配置
 access_key = "VZatkveiPGOhLTqMdIXR"
 secret_key = "TL5V3ZhIDb1rijNzYwGMdgqJQmvfAXlHO8p64SBo"
-providor_name = "freeman"
+provider_name = "freeman"
 bucket = "log-data"
 prefix = "default"  # 不同的项目设置不同的前缀
 region = "us-east-1"

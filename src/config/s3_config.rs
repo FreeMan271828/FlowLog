@@ -7,14 +7,14 @@ use crate::{config::ConfigTrait, constants};
 
 #[derive(Debug, Deserialize, Clone,)]
 pub struct S3Config{
-    access_key : Cow<'static, str>,
-    secret_key : Cow<'static, str>,
-    providor_name : Cow<'static, str>,
-    bucket : Cow<'static, str>,
-    prefix : Cow<'static, str>, 
-    region : Cow<'static, str>,
-    end_point_url : Cow<'static, str>,
-    force_path_style : bool,
+    pub(crate) access_key : Cow<'static, str>,
+    pub(crate) secret_key : Cow<'static, str>,
+    provider_name: Cow<'static, str>,
+    pub(crate) bucket : Cow<'static, str>,
+    pub(crate) prefix : Cow<'static, str>,
+    pub(crate) region : Cow<'static, str>,
+    pub(crate) end_point_url : Cow<'static, str>,
+    pub(crate) force_path_style : bool,
 }
 
 impl Default for S3Config {
@@ -22,7 +22,7 @@ impl Default for S3Config {
         Self { 
             access_key: Cow::Borrowed(""),
             secret_key: Cow::Borrowed(""), 
-            providor_name: Cow::Borrowed(""), 
+            provider_name: Cow::Borrowed(""),
             bucket: Cow::Borrowed(""), 
             prefix: Cow::Borrowed(""), 
             region: Cow::Borrowed("us-east-1"), 
