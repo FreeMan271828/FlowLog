@@ -8,9 +8,10 @@ description = "A more powerful with mulity_output logger"
 repository = "https://github.com/FreeMan271828/FlowLog"
 
 [dependencies]
-chrono = "0.4.44"
+chrono = {version = "0.4.44", features = ["serde"]}
 config = "0.15.23"
 serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0"
 strum = { version = "0.26", features = ["derive"] }
 notify = "6.1"
 notify-debouncer-mini = "0.4"

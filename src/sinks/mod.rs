@@ -3,12 +3,12 @@ use strum::EnumString;
 
 use crate::{Configurable, LogHandler};
 use crate::{entity::record::LogRecord};
-use crate::sinks::console::ConsoleSink;
-use crate::sinks::file::FileSink;
+use crate::sinks::console_sink::ConsoleSink;
+use crate::sinks::file_sink::FileSink;
 
-pub mod console;
-pub mod s3;
-pub mod file;
+pub mod console_sink;
+pub mod s3_sink;
+pub mod file_sink;
 
 /// 对于sink_type到具体执行的映射
 pub fn sink(sink_type: &SinkType, record: &LogRecord) -> Result<(), std::io::Error> {

@@ -568,6 +568,7 @@ dependencies = [
  "notify",
  "notify-debouncer-mini",
  "serde",
+ "serde_json",
  "strum",
  "tokio",
 ]
@@ -654,6 +655,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]

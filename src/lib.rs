@@ -5,11 +5,12 @@ pub mod sinks;
 pub mod macros;
 pub mod constants;
 pub mod config;
+pub mod tools;
 
 use std::{io, sync::{Arc, RwLock}};
 
 pub use crate::entity::level::LogLevel;
-use crate::{entity::record::LogRecord, pipeline::processor::LogProcessor, sinks::{console::ConsoleSink, file::FileSink}};
+use crate::{entity::record::LogRecord, pipeline::processor::LogProcessor, sinks::{console_sink::ConsoleSink, file_sink::FileSink}};
 pub use crate::pipeline::emitter::LogEmitter;
 
 /// 获取全部的重新加载函数，对于config的热加载需要

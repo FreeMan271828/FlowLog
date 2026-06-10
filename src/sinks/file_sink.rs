@@ -1,6 +1,5 @@
 use std::{fs, path::PathBuf};
 use std::fs::create_dir_all;
-use std::io::Write;
 use std::sync::{Arc, OnceLock, RwLock};
 use chrono::Local;
 
@@ -8,6 +7,7 @@ use crate::config::ConfigTrait;
 use crate::config::file_config::FileConfig;
 use crate::{Configurable, LogHandler, constants};
 use crate::entity::record::LogRecord;
+use crate::tools::*;
 
 /// 文件保存逻辑
 /// 1. 获取最新的文件，判断当前文件是否超额
@@ -45,11 +45,8 @@ impl LogHandler for FileSink {
             println!("Something err while handling file, you can choose to remove File option");
             return Ok(());
         }
-        let mut file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
-        let bytes = record.as_bytes();
-        file.write_all(bytes.as_slice()).expect("Write File Err");
-        file.flush().expect("Flush File Err");
-        Ok(())
+        let file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
+        file_tools::write_to_file_(&file, record)
     }
 }
 
@@ -78,19 +75,18 @@ impl FileSink {
         if !dir_path.exists() {
             create_dir_all(dir_path).expect("Create dir Err");
         }
-        if let Some(newest_file) = Self::get_newest_file(dir_path)? {
-            let meta = fs::metadata(&newest_file)?;
-            if meta.len() < max_size {
+        if let Some(newest_file) = file_tools::get_newest_file(dir_path)? {
+            if file_tools::get_file_size(&newest_file)? < max_size {
                 return fs::OpenOptions::new().append(true).open(newest_file);
             }
-            let file = Self::create_file(dir_path)?;
+            let file = Self::create_log_file(dir_path)?;
             let current_count = fs::read_dir(dir_path)?
                 .filter_map(|e| e.ok())
                 .filter(|e| e.file_name().to_string_lossy().starts_with("log-"))
                 .count();
             if current_count > rotate_num {
                 // 删除上面获取到的、排序最靠前的最旧文件
-                if let Some(oldest) = Self::get_oldest_file(dir_path)? {
+                if let Some(oldest) = file_tools::get_oldest_file(dir_path)? {
                     fs::remove_file(oldest)?;
                 }
             }
@@ -98,54 +94,13 @@ impl FileSink {
         }
         // 文件夹中没有文件，创建
         else{
-            Self::create_file(dir_path)
+            Self::create_log_file(dir_path)
         }
     }
 
-    fn create_file(dir_path: &PathBuf) -> Result<fs::File, std::io::Error> {
+    fn create_log_file(dir_path: &PathBuf) -> Result<fs::File, std::io::Error> {
         let today_str = Local::now().format("%Y-%m-%d").to_string();
         let first_path = dir_path.join(format!("log-{}.log", today_str));
         Ok(fs::File::create(first_path)?)
     }
-
-    fn get_oldest_file(dir_path: &PathBuf) -> Result<Option<PathBuf>, std::io::Error> {
-        let files: Vec<PathBuf> = Self::get_sorted_files(dir_path)?;
-        if files.is_empty() {
-            Ok(None)
-        } else {
-            let oldest = files.first().unwrap().clone();
-            Ok(Some(oldest))
-        }
-    }
-
-    fn get_newest_file(dir_path: &PathBuf) -> Result<Option<PathBuf>, std::io::Error> {
-        let files: Vec<PathBuf> = Self::get_sorted_files(dir_path)?;
-        if files.is_empty() {
-            Ok(None)
-        } else {
-            let oldest = files.last().unwrap().clone();
-            Ok(Some(oldest))
-        }
-    }
-
-    fn get_sorted_files(dir_path: &PathBuf) -> Result<Vec<PathBuf>, std::io::Error> {
-        let mut files: Vec<PathBuf> = dir_path.read_dir()?
-            .filter_map(|entry|  {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if path.is_file() {
-                    if let Some(file_name) = path.file_name()?.to_str() {
-                        if file_name.starts_with("log-") {
-                            return Some(path);
-                        }
-                    }
-                }
-                None
-            }
-            )
-            .collect();
-        files.sort();
-        Ok(files)
-    }
-
 }

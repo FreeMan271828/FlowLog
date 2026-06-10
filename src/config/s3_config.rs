@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 use crate::{config::ConfigTrait, constants};
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone,)]
 pub struct S3Config{
     pub(crate) access_key : Cow<'static, str>,
@@ -27,7 +28,7 @@ impl Default for S3Config {
             prefix: Cow::Borrowed(""), 
             region: Cow::Borrowed("us-east-1"), 
             end_point_url: Cow::Borrowed(""), 
-            force_path_style: true, 
+            force_path_style: true,
         }
     }
 }
