@@ -1,7 +1,8 @@
 #[macro_export]
 macro_rules! logger {
     ($level:expr, $($arg:tt)+) => {
-        let _ = $crate::LogEmitter::emit(
+        let _ = &crate::service::pipeline::emitter::LogEmitter::
+        emit(
             $level,
             module_path!(),
             file!(),

@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use config::{Config, File};
 use serde::Deserialize;
 
-use crate::{config::ConfigTrait, constants};
+use crate::{constants, tools::ConfigTrait};
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone,)]

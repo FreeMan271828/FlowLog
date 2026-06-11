@@ -1,4 +1,8 @@
-/// 通用工具
+use config::ConfigError;
 
-pub mod file_tools;
-pub mod s3_tools;
+pub mod s3;
+pub mod file;
+
+pub trait ConfigTrait : Default{
+    fn load() -> Result<Self, ConfigError> where Self: Sized;
+}

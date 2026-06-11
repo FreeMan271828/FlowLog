@@ -60,8 +60,16 @@ put_min_ratio = 0.4  # 本地临时文件上传的最小比例
 
 ## 核心架构
 
-* **Emitter (发射器)**：负责捕获系统或业务产生的日志，并将其转化为标准的 `Record`。
-* **Translator (中转器)**：常用于日志的动态过滤（如根据 `Level` 筛选）以及发送日志数据给各个Sink。
-* **Sink (接收器)**：负责将格式化后的数据发送至最终的目的地（终端、文件或云端）。
+* **Emitter**：负责捕获系统或业务产生的日志，并将其转化为标准的 `Record`。
+* **Translator**：常用于日志的动态过滤（如根据 `Level` 筛选）以及发送日志数据给各个Sink。
+* **Sink**：负责将格式化后的数据发送至最终的目的地（终端、文件或云端）。
 
 不同的处理器之间采用松耦合开发，通过集成函数数组来互相调用。
+
+在entity中定义了全局实体类
+在tools中包含有工具的集成驱动，包括s3、file
+在pipeline中实现了发射器和中转器，为macros提供实现
+在service中实现了具体的存储方式，有Console、S3、File，每一个都有config和具体的service。
+在lib中定义了
+- get_reload：聚合service的reload函数
+- sink：日志深潜，聚合了全部的service的使用，把SinkType转化成具体的行为

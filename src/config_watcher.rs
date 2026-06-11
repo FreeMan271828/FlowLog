@@ -3,7 +3,7 @@ use std::{path::Path, sync::{Arc, Mutex, OnceLock, atomic::AtomicBool, mpsc::{se
 use std::result::Result::Err;
 use notify::{RecommendedWatcher, Watcher, event};
 
-use crate::{constants, get_reload};
+use crate::{constants, service::get_reload};
 
 static WATCHER_HANDLE: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
 static STOP_HANDLE: OnceLock<Arc<AtomicBool>> = OnceLock::new();

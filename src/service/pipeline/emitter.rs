@@ -1,9 +1,9 @@
 use crate::{Configurable, LogHandler};
 use crate::entity::level::LogLevel;
 use crate::entity::record::LogRecord;
-use crate::pipeline::translator::LogTranslator;
 use std::borrow::Cow;
 use std::io::Error;
+use super::translator::LogTranslator;
 /// 日志发送器，负责日志的组装、发送给日志处理器
 pub struct LogEmitter;
 

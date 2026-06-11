@@ -2,11 +2,13 @@ use std::{fs, io};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-use crate::config::s3_sink_config::S3SinkConfig;
+use crate::tools::ConfigTrait;
+use crate::{Configurable, LogHandler};
 use crate::entity::record::LogRecord;
-use crate::tools::s3_tools::S3Client;
-use crate::tools::{file_tools, s3_tools};
-use crate::{Configurable, LogHandler, config::{ConfigTrait}};
+use crate::service::s3_log::s3_sink_config::S3SinkConfig;
+use crate::tools::s3::s3_tools::S3Client;
+use crate::tools::file::file_tools::*;
+
 
 /// S3存储采用双磁盘异步写入
 /// 1. 在当前文件夹下使用隐形文件.tmp_log_a，持续写入，如果文件大小超过阈值，那么就创建.tmp_log_b (a和b都是有时间顺序的随机数)，然后把之前的文件后台上传到S3，并删除
@@ -43,7 +45,7 @@ impl Configurable for S3Sink {
                 let threasold = 
                     instance.read().unwrap().config.put_size as f64 * 
                     instance.read().unwrap().config.put_min_ratio;
-                if file_tools::get_file_size(&file_path).unwrap() as f64 > threasold {
+                if get_file_size(&file_path).unwrap() as f64 > threasold {
                     let sink = &*instance.read().expect("Failed to acquire read lock");
                     let client = &*sink.s3_client.read().expect("Failed to acquire read lock");
                     client.put_file(&file_path.to_string_lossy()).unwrap();
@@ -74,13 +76,13 @@ impl LogHandler for S3Sink {
                 return Ok(());
             }
             let file_path = PathBuf::from(&*guard);
-            file_tools::get_file_size(&file_path)? > self.config.put_size
+            get_file_size(&file_path)? > self.config.put_size
         }; 
         if need_update{
             let _ = client.put_file(&file_path.to_string_lossy());
             file_path = PathBuf::from(Self::update_tmp_file_name().unwrap());
         }
-        let _ = file_tools::write_to_file(&file_path, record, true);
+        let _ = write_to_file(&file_path, record, true);
         Ok(())
     }
 }
@@ -173,7 +175,7 @@ impl S3Sink {
         });
         S3Sink { 
             config, 
-            s3_client: s3_tools::S3Client::new(),
+            s3_client: S3Client::new(),
         }
     }
 }

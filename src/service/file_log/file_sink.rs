@@ -3,11 +3,11 @@ use std::fs::create_dir_all;
 use std::sync::{Arc, OnceLock, RwLock};
 use chrono::Local;
 
-use crate::config::ConfigTrait;
-use crate::config::file_config::FileConfig;
+use crate::service::file_log::file_config::FileConfig;
+use crate::tools::ConfigTrait;
 use crate::{Configurable, LogHandler, constants};
 use crate::entity::record::LogRecord;
-use crate::tools::*;
+use crate::tools::file::file_tools::*;
 
 /// 文件保存逻辑
 /// 1. 获取最新的文件，判断当前文件是否超额
@@ -46,7 +46,7 @@ impl LogHandler for FileSink {
             return Ok(());
         }
         let file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
-        file_tools::write_to_file_(&file, record)
+        write_to_file_(&file, record)
     }
 }
 
@@ -75,8 +75,8 @@ impl FileSink {
         if !dir_path.exists() {
             create_dir_all(dir_path).expect("Create dir Err");
         }
-        if let Some(newest_file) = file_tools::get_newest_file(dir_path)? {
-            if file_tools::get_file_size(&newest_file)? < max_size {
+        if let Some(newest_file) = get_newest_file(dir_path)? {
+            if get_file_size(&newest_file)? < max_size {
                 return fs::OpenOptions::new().append(true).open(newest_file);
             }
             let file = Self::create_log_file(dir_path)?;
@@ -86,7 +86,7 @@ impl FileSink {
                 .count();
             if current_count > rotate_num {
                 // 删除上面获取到的、排序最靠前的最旧文件
-                if let Some(oldest) = file_tools::get_oldest_file(dir_path)? {
+                if let Some(oldest) = get_oldest_file(dir_path)? {
                     fs::remove_file(oldest)?;
                 }
             }

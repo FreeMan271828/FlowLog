@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use config::{Config, File};
 use serde::Deserialize;
 
-use crate::{config::ConfigTrait, constants};
+use crate::{constants, tools::ConfigTrait};
 
 /// file_path 保留日志文件夹
 /// max_size 日志超过这个大小创建新的文件

@@ -1,6 +1,6 @@
 use std::{fs, io, path::{PathBuf}, sync::{Arc, OnceLock, RwLock}};
 
-use crate::{Configurable, config::{ConfigTrait, s3_config::S3Config}};
+use crate::{Configurable, tools::{ConfigTrait, s3::s3_config::S3Config}};
 use aws_config::Region;
 use aws_sdk_s3::{Client as Client, config::Credentials, primitives::ByteStream};
 

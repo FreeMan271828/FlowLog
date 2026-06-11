@@ -1,7 +1,7 @@
 use config::{Config, File, ConfigError};
 use serde::{Deserialize, Serialize};
 
-use crate::{config::ConfigTrait, constants};
+use crate::{constants, tools::ConfigTrait};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct S3SinkConfig{

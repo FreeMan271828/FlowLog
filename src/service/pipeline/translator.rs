@@ -1,4 +1,4 @@
-use crate::{Configurable, LogHandler, config::{ConfigTrait, pipe_config::LogConfig}, entity::record::LogRecord, sinks::sink};
+use crate::{Configurable, LogHandler, entity::record::LogRecord, service::{pipeline::pipe_config::LogConfig, sink}, tools::ConfigTrait};
 use std::sync::{Arc, OnceLock, RwLock};
 
 static INSTANCE: OnceLock<Arc<RwLock<LogTranslator>>> = OnceLock::new();

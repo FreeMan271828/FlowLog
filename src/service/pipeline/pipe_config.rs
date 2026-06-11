@@ -1,4 +1,4 @@
-use crate::{config::ConfigTrait, constants, entity::level::LogLevel, sinks::SinkType};
+use crate::{constants, entity::level::LogLevel, service::SinkType, tools::ConfigTrait};
 use config::{Config, ConfigError, File};
 use serde::Deserialize;
 
