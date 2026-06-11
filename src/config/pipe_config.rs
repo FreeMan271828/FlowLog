@@ -1,4 +1,4 @@
-use crate::{constants, core::level::LogLevel, sinks::SinkType};
+use crate::{config::ConfigTrait, constants, entity::level::LogLevel, sinks::SinkType};
 use config::{Config, ConfigError, File};
 use serde::Deserialize;
 
@@ -22,7 +22,7 @@ impl Default for LogConfig {
     }
 }
 
-impl crate::Config for LogConfig {
+impl ConfigTrait for LogConfig {
     fn load() -> Result<Self, ConfigError> {
         let s = Config::builder()
             .add_source(File::with_name(constants::CONFIG_PATH)

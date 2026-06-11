@@ -1,13 +1,14 @@
 use std::borrow::Cow;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
 
-use crate::core::level::LogLevel;
+use crate::entity::level::LogLevel;
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LogRecord<'a>{
-    pub timestamp: DateTime<Utc>,
+    pub timestamp: DateTime<Local>,
     pub level: LogLevel,
     pub target: Cow<'a, str>,
     pub file: Option<&'a str>,
@@ -19,23 +20,12 @@ pub struct LogRecord<'a>{
 impl<'a> LogRecord<'a> {
     pub fn new(level: LogLevel, body: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            timestamp: Utc::now(),
+            timestamp: Local::now(),
             level,
             target: Cow::Borrowed(""),
             file: None,
             line: None,
             body: body.into(),
         }
-    }
-
-    pub fn as_bytes(&self) -> Vec<u8> {
-        format!(
-            "[{}] [{:?}] ({}:{}) - {}\n",
-            self.timestamp.format("%H:%M:%S%.3f"),
-            self.level,
-            self.file.unwrap_or("unknown"),
-            self.line.unwrap_or(0),
-            self.body
-        ).into_bytes()
     }
 }

@@ -2,3 +2,5 @@
 /log
 /tests
 /.idea
+/.vscode
+/.tmp*

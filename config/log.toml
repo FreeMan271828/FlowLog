@@ -1,12 +1,27 @@
 # config/log.toml
 
-level = "Dbg"              # 日志输出级别：Dbg, Log, Warn, Err
+level = "Log"               # 日志输出级别：Dbg, Log, Warn, Err
 enable_async = true         # 是否开启异步日志流
 buffer_size = 2048          # 异步模式下的缓冲区大小（队列容量）
 
-dir_path = "./log"         # 日志的文件输出文件夹
-max_size = 10485760         # 单个文件的最大大小
-rotate_num = 5              # 最多保留的文件数目
+# 日志深潜方式，Console, File, S3, Elastic
+sink_type = ["S3", "Console"]
 
-# 日志重定向深潜方式，Console, File, S3, Elastic
-sink_type = ["Console", "File"]
+# 文件深潜的配置
+dir_path = "./log"          # 日志的文件输出文件夹
+max_size = 10485760         # 单个文件的最大大小, 10MB
+rotate_num = 1              # 最多保留的文件数目
+
+# S3的配置
+access_key = "VZatkveiPGOhLTqMdIXR"
+secret_key = "TL5V3ZhIDb1rijNzYwGMdgqJQmvfAXlHO8p64SBo"
+provider_name = "freeman"
+bucket = "log-data"
+prefix = "test"  # 不同的项目设置不同的前缀
+region = "us-east-1"
+end_point_url = "http://118.89.136.119:11000"
+force_path_style = true
+
+# S3深潜的配置
+put_size = 10485760  # 本地临时文件上传的大小
+put_min_ratio = 0.4  # 本地临时文件上传的最小比例
