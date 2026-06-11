@@ -1,4 +1,4 @@
-use std::{io, path::PathBuf, sync::{Arc, OnceLock, RwLock}};
+use std::{fs, io, path::{PathBuf}, sync::{Arc, OnceLock, RwLock}};
 
 use crate::{Configurable, config::{ConfigTrait, s3_config::S3Config}};
 use aws_config::Region;
@@ -44,42 +44,44 @@ impl Configurable for S3Client {
 
 impl S3Client { 
 
+    /// TODO! 目前需要读取文件内容到内存中，大文件容易卡死，需要优化，解决文件上传的校验错误问题
     /// 上传文件到配置选定的bucket和prefix文件夹
-    pub fn update_file(&self, source_path: &str)  -> Result<(), io::Error> {
-        let config = S3Config::load().unwrap_or_else(|_| {
-            S3Config::default()
-        });
+    pub fn put_file(&self, source_path: &str) -> Result<(), io::Error> {
+        let config = S3Config::load().unwrap_or_else(|_| S3Config::default());
         let source_file_buf = PathBuf::from(source_path);
-        if !source_file_buf.exists(){
+        
+        if !source_file_buf.exists() {
             return Err(io::Error::new(io::ErrorKind::NotFound, "Cannot find the file"));
         }
         if !source_file_buf.is_file() {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput,format!("路径不是文件: {}", source_path)));
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("路径不是文件: {}", source_path)));
         }
+        
         let file_name = source_file_buf
             .file_name()
             .and_then(|name| name.to_str())
-            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput,"无法获取文件名")
-        )?;
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "无法获取文件名"))?;
+        
         let bucket = config.bucket.clone().into_owned();
         let key = if config.prefix.ends_with('/') {
             format!("{}{}", config.prefix, file_name)
         } else {
             format!("{}/{}", config.prefix, file_name)
         };
+        
         let client = self.client.clone();
         let source_path_owned = source_path.to_string();
+
+        println!("Start putting file");
         let result = self.rt.block_on(async move {
+            let content = fs::read(&source_path_owned).unwrap();
+            let body = ByteStream::from(content);
+
             client.put_object()
                 .bucket(bucket.clone())
                 .key(key.clone())
-                .body(ByteStream::from_path(source_path_owned.clone()).await
-                    .map_err(|e| {
-                        eprintln!("Failed to create ByteStream from file {}: {:?}", source_path_owned, e);
-                        e
-                    })
-                    .unwrap())
-                .content_type("text/plain")
+
+                .body(body)
                 .send()
                 .await
                 .map_err(|e| {
@@ -87,16 +89,17 @@ impl S3Client {
                         bucket, key, source_path_owned, e);
                     e
                 })
-            }
-        );
+        });
+        println!("Putting file Over");
         match result {
             Ok(_) => Ok(()),
             Err(err) => Err(io::Error::new(io::ErrorKind::Other, err.to_string())),
         }
     }
 
+
     /// 上传内容到指定文件，指定在prefix文件夹，target_path是指定写入的文件路径
-    pub fn update_data(&self, target_path: &str, content: &[u8]) -> Result<(), std::io::Error> {
+    pub fn put_data(&self, target_path: &str, content: &[u8]) -> Result<(), std::io::Error> {
         let config = S3Config::load().unwrap_or_else(|_| {
             S3Config::default()
         });
@@ -115,7 +118,7 @@ impl S3Client {
         };
         let client = self.client.clone();
         let body = ByteStream::from(bytes::Bytes::copy_from_slice(content));
-
+        println!("Start putting data");
         let result = self.rt.block_on(async move {
             client.put_object()
                 .bucket(bucket)
@@ -125,7 +128,7 @@ impl S3Client {
                 .send()
                 .await
         });
-
+        println!("Putting data over");
         match result {
             Ok(_) => Ok(()),
             Err(err) => Err(std::io::Error::new(std::io::ErrorKind::Other, err.to_string())),
@@ -210,14 +213,14 @@ impl S3Client {
 fn test_s3_client_update_file(){
     let binding = S3Client::new();
     let s3_sink = binding.read().expect("Err while building s3");
-    let _ = s3_sink.update_file("README.md").expect("Some thing err");
+    let _ = s3_sink.put_file("README.md").expect("Some thing err");
 }
 
 #[test]
 fn test_s3_client_write(){
     let binding = S3Client::new();
     let s3_sink = binding.read().expect("Err while building s3");
-    let _ = s3_sink.update_data("test.log", "test".as_bytes());
+    let _ = s3_sink.put_data("test.log", "test".as_bytes());
     let _ = s3_sink.list_files();
 }
 

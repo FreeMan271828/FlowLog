@@ -3,13 +3,19 @@ use std::{fs::{self, File}, io::{self, Write}, path::PathBuf};
 use serde::Serialize;
 
 /// 写入指定的文件
-pub fn write_to_file<T: Serialize>(file_path: &PathBuf, data: &T) -> Result<(), io::Error>{
-    let file = fs::File::create(file_path)?;
+pub fn write_to_file<T: Serialize>(file_path: &PathBuf, data: &T, append: bool) -> Result<(), io::Error>{
+     let file = fs::OpenOptions::new()
+        .append(append)
+        .create(true)
+        .open(file_path)?;
     write_to_file_(&file, data)
 }
 pub fn write_to_file_<T: Serialize>(mut file: &File, data: &T) -> Result<(), io::Error>{
-    let json = serde_json::to_string(data)
+    let mut json = serde_json::to_string(data)
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+    if !json.ends_with('\n') {
+        json.push('\n');
+    }
     file.write_all(json.as_bytes()).expect("Write File Err");
     file.flush().expect("Flush File Err");
     Ok(())

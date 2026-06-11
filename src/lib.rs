@@ -10,13 +10,13 @@ pub mod tools;
 use std::{io, sync::{Arc, RwLock}};
 
 pub use crate::entity::level::LogLevel;
-use crate::{entity::record::LogRecord, pipeline::processor::LogProcessor, sinks::{console_sink::ConsoleSink, file_sink::FileSink}};
+use crate::{entity::record::LogRecord, pipeline::processor::LogProcessor, sinks::{console_sink::ConsoleSink, file_sink::FileSink, s3_sink::S3Sink}};
 pub use crate::pipeline::emitter::LogEmitter;
 
 /// 获取全部的重新加载函数，对于config的热加载需要
 pub fn get_reload() -> Vec<fn()>{
     vec![
-        FileSink::reload, ConsoleSink::reload, LogProcessor::reload,
+        FileSink::reload, ConsoleSink::reload, LogProcessor::reload, S3Sink::reload
     ]
 }
 

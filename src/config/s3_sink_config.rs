@@ -5,15 +5,15 @@ use crate::{config::ConfigTrait, constants};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct S3SinkConfig{
-    pub(crate) update_size : u64,
-    pub(crate) update_min_ratio : f64,
+    pub(crate) put_size : u64,
+    pub(crate) put_min_ratio : f64,
 }
 
 impl Default for S3SinkConfig {
     fn default() -> Self {
         Self {
-            update_size : 0,
-            update_min_ratio : 0.5,
+            put_size : 0,
+            put_min_ratio : 0.5,
         }
     }
 }

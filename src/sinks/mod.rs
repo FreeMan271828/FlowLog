@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use strum::EnumString;
 
+use crate::sinks::s3_sink::S3Sink;
 use crate::{Configurable, LogHandler};
 use crate::{entity::record::LogRecord};
 use crate::sinks::console_sink::ConsoleSink;
@@ -15,7 +16,7 @@ pub fn sink(sink_type: &SinkType, record: &LogRecord) -> Result<(), std::io::Err
     match sink_type {
         SinkType::Console => ConsoleSink::new().read().unwrap().redirect(record),
         SinkType::File => FileSink::new().read().unwrap().redirect(record),
-        SinkType::S3 => todo!(),
+        SinkType::S3 => S3Sink::new().read().unwrap().redirect(record),
         SinkType::Elastic => todo!(),
     }
 }

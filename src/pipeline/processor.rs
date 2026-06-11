@@ -3,6 +3,7 @@ use std::sync::{Arc, OnceLock, RwLock};
 
 static INSTANCE: OnceLock<Arc<RwLock<LogProcessor>>> = OnceLock::new();
 
+
 pub struct LogProcessor {
     config: LogConfig,
 }

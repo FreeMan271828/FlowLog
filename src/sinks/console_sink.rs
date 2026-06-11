@@ -20,13 +20,20 @@ impl Configurable for ConsoleSink {
 
 impl LogHandler for ConsoleSink{
     fn handle(&self, record: &LogRecord) -> Result<(), std::io::Error> {
+        let body = &record.body;
+        let max_chars = 20; // 设置最大显示长度
+         let display_body = if body.chars().count() > max_chars {
+            format!("{}...", body.chars().take(max_chars).collect::<String>())
+        } else {
+            body.to_string()
+        };
         println!(
             "[{}] [{:?}] ({}:{}) - {}",
             record.timestamp.format("%H:%M:%S%.3f"),
             record.level,
             record.file.unwrap_or("unknown"),
             record.line.unwrap_or(0),
-            record.body
+            display_body,
         );
         Ok(())
     }

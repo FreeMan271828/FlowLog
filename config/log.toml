@@ -5,7 +5,7 @@ enable_async = true         # 是否开启异步日志流
 buffer_size = 2048          # 异步模式下的缓冲区大小（队列容量）
 
 # 日志深潜方式，Console, File, S3, Elastic
-sink_type = ["Console"]
+sink_type = ["S3", "Console"]
 
 # 文件深潜的配置
 dir_path = "./log"          # 日志的文件输出文件夹
