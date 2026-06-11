@@ -1,7 +1,7 @@
-use std::{fs, io, thread};
+use std::{fs, io};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock, RwLock};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use crate::config::s3_sink_config::S3SinkConfig;
 use crate::entity::record::LogRecord;
 use crate::tools::s3_tools::S3Client;
@@ -35,16 +35,19 @@ impl Configurable for S3Sink {
     }
 
     /// 配置文件的重载，见3
+    /// 如果当前临时日志文件大小大于旧的配置文件的阈值（文件大小*比率），直接上传并创建新的文件
+    #[allow(unused)]
     fn reload() {
         if let Some(instance) = INSTANCE.get(){
-            // 配置文件修改后，如果当前临时日志文件大小大于旧的配置文件的阈值（文件大小*比率），则直接上传
-            if let Some(file_path) = Self::parse_file_path().unwrap(){
-                let threasold = instance.read().unwrap().config.put_size as f64 
-                * instance.read().unwrap().config.put_min_ratio;
+            if let Some(mut file_path) = Self::parse_file_path().unwrap(){
+                let threasold = 
+                    instance.read().unwrap().config.put_size as f64 * 
+                    instance.read().unwrap().config.put_min_ratio;
                 if file_tools::get_file_size(&file_path).unwrap() as f64 > threasold {
                     let sink = &*instance.read().expect("Failed to acquire read lock");
                     let client = &*sink.s3_client.read().expect("Failed to acquire read lock");
                     client.put_file(&file_path.to_string_lossy()).unwrap();
+                    file_path = PathBuf::from(Self::update_tmp_file_name().unwrap());
                 }
             }
             let new_sink = Self::create_s3_sink();
@@ -67,7 +70,7 @@ impl LogHandler for S3Sink {
                 std::io::Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
             })?;
             if guard.is_empty() {
-                println!("The tmp file is not existed");
+                eprintln!("The tmp file is not existed");
                 return Ok(());
             }
             let file_path = PathBuf::from(&*guard);
@@ -91,7 +94,7 @@ impl S3Sink {
                 std::io::Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
             })?;
             if guard.is_empty() {
-                println!("The tmp file is not existed");
+                eprintln!("The tmp file is not existed");
                 return Ok(None);
             }
             Ok(Some(PathBuf::from(&*guard)))
@@ -175,22 +178,27 @@ impl S3Sink {
     }
 }
 
+#[cfg(test)]
+mod test{
+use std::{thread, time::Duration};
+use super::*;
 
-#[test]
-fn test_handle(){
-    let s3_sink = S3Sink::new();
-    // 创建1M大小的内容
-    let large_body = "A".repeat(1024 * 1024); // 1MB
-    let record = LogRecord::new(crate::LogLevel::Dbg, &large_body);
-    let s3_sink = &*s3_sink.read().unwrap();
-    println!("Writing records, each record is 1MB");
-    let mut index = 1;
-    loop {
-        let _= s3_sink.handle(&record);  
-        index = index + 1;
-        if index % 5 == 0 {
-            println!("Written {} records", index);
-        } 
-        thread::sleep(Duration::from_secs(2));
+    #[test]
+    fn test_handle(){
+        let s3_sink = S3Sink::new();
+        // 创建1M大小的内容
+        let large_body = "A".repeat(1024 * 1024); // 1MB
+        let record = LogRecord::new(crate::LogLevel::Dbg, &large_body);
+        let s3_sink = &*s3_sink.read().unwrap();
+        println!("Writing records, each record is 1MB");
+        let mut index = 1;
+        loop {
+            let _= s3_sink.handle(&record);  
+            index = index + 1;
+            if index % 5 == 0 {
+                println!("Written {} records", index);
+            } 
+            thread::sleep(Duration::from_secs(2));
+        }
     }
 }

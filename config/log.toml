@@ -23,5 +23,5 @@ end_point_url = "http://118.89.136.119:11000"
 force_path_style = true
 
 # S3深潜的配置
-update_size = 10485760  # 本地临时文件上传的大小
-update_min_ratio = 0.6  # 本地临时文件上传的最小比例
+put_size = 10485760  # 本地临时文件上传的大小
+put_min_ratio = 0.4  # 本地临时文件上传的最小比例

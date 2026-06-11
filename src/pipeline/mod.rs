@@ -1,2 +1,2 @@
 pub mod emitter;
-pub mod processor;
+pub mod translator;

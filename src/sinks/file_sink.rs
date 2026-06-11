@@ -42,7 +42,7 @@ impl LogHandler for FileSink {
     fn handle(&self, record: &LogRecord) -> Result<(), std::io::Error> {
         let FileConfig { dir_path, max_size, rotate_num } = &self.config;
         if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
-            println!("Something err while handling file, you can choose to remove File option");
+            eprintln!("Something err while handling file, you can choose to remove File option");
             return Ok(());
         }
         let file = Self::choose_file(dir_path, max_size.unwrap(), rotate_num.unwrap())?;
@@ -59,13 +59,13 @@ impl FileSink {
         
         let min_config = constants::FILE_CONFIG_MIN;
         if config.max_size < Some(min_config.0) || config.rotate_num < Some(min_config.1) {
-            println!("日志配置小于最低要求：512KB，1个轮转文件");
+            eprintln!("日志配置小于最低要求：512KB，1个轮转文件");
             config = FileConfig::default();
         }
         
         let FileConfig { dir_path, max_size, rotate_num } = &config;
         if dir_path.to_string_lossy().is_empty() || max_size.is_none() || rotate_num.is_none() {
-            println!("无法加载文件日志配置，将自动禁用");
+            eprintln!("无法加载文件日志配置，将自动禁用");
         }
         
         FileSink { config }

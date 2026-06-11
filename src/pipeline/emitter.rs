@@ -1,7 +1,7 @@
 use crate::{Configurable, LogHandler};
 use crate::entity::level::LogLevel;
 use crate::entity::record::LogRecord;
-use crate::pipeline::processor::LogProcessor;
+use crate::pipeline::translator::LogTranslator;
 use std::borrow::Cow;
 use std::io::Error;
 /// 日志发送器，负责日志的组装、发送给日志处理器
@@ -14,6 +14,6 @@ impl LogEmitter {
         record.target = Cow::Borrowed(target);
         record.file = Some(file);
         record.line = Some(line);
-        LogProcessor::new().read().unwrap().handle(&record)
+        LogTranslator::new().read().unwrap().handle(&record)
     }
 }
